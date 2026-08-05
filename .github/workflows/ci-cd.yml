@@ -9,9 +9,15 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    steps:
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+      IMAGE_TAG: ${{ github.sha }}
 
-      # Step 1 - Checkout source code
+    steps:
+      # Step 1 - Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -21,7 +27,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       # Step 3 - Login to Amazon ECR
       - name: Login to Amazon ECR
@@ -30,24 +36,16 @@ jobs:
 
       # Step 4 - Build Docker Image
       - name: Build Docker Image
-        env:
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-          IMAGE_TAG: latest
-
         run: |
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-      # Step 5 - Push Image to Amazon ECR
+      # Step 5 - Push Docker Image to Amazon ECR
       - name: Push Docker Image
-        env:
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-          IMAGE_TAG: latest
-
         run: |
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       # Step 6 - Install kubectl
       - name: Install kubectl
@@ -55,34 +53,40 @@ jobs:
         with:
           version: latest
 
-      # Step 7 - Connect to EKS Cluster
+      # Step 7 - Configure kubeconfig
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig \
-            --region ${{ secrets.AWS_REGION }} \
-            --name ${{ secrets.EKS_CLUSTER_NAME }}
+            --region $AWS_REGION \
+            --name $EKS_CLUSTER_NAME
 
-      # Step 8 - Deploy latest image to EKS
+      # Step 8 - Deploy latest build to EKS
       - name: Deploy to EKS
-        env:
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-
         run: |
           kubectl set image deployment/flask-app \
-          flask-app=$ECR_REGISTRY/$ECR_REPOSITORY:latest
+            flask-app=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      # Step 9 - Wait for deployment to complete
-      - name: Verify Deployment
+      # Step 9 - Wait for deployment rollout
+      - name: Verify Rollout
         run: |
           kubectl rollout status deployment/flask-app
 
-      # Step 10 - Show Pods
+      # Step 10 - Show Deployment
+      - name: Verify Deployment
+        run: |
+          kubectl get deployment flask-app
+
+      # Step 11 - Show ReplicaSets
+      - name: Verify ReplicaSets
+        run: |
+          kubectl get rs
+
+      # Step 12 - Show Pods
       - name: Verify Pods
         run: |
-          kubectl get pods
+          kubectl get pods -o wide
 
-      # Step 11 - Show Services
+      # Step 13 - Show Services
       - name: Verify Services
         run: |
           kubectl get svc
