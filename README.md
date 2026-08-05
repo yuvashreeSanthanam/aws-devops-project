@@ -245,11 +245,29 @@ kubectl get svc
 Add screenshots here:
 
 - GitHub Actions Success
+- <img width="1897" height="1080" alt="image" src="https://github.com/user-attachments/assets/4145b3c0-d934-4837-9965-c1568c755820" />
+
+
+
 - Amazon ECR Repository
+  <img width="1912" height="1042" alt="image" src="https://github.com/user-attachments/assets/a84590fa-bb89-4ac7-a48c-a694fc2176b3" />
+
 - Amazon EKS Cluster
+<img width="1910" height="1047" alt="image" src="https://github.com/user-attachments/assets/37697fac-924e-402e-9bba-c46778b3516f" />
+
 - Running Pods
+
+<img width="1912" height="1057" alt="image" src="https://github.com/user-attachments/assets/2fe2b0e3-2e2f-4e10-879e-7486bb0f7ead" />
+
 - Kubernetes Service
+- <img width="1396" height="377" alt="image" src="https://github.com/user-attachments/assets/27c14761-a804-4e72-a939-974a0b7c0951" />
+
+
+  
 - Browser Output
+
+<img width="1908" height="1057" alt="image" src="https://github.com/user-attachments/assets/f814c965-8c10-42e0-a0be-a7d6e3383314" />
+
 
 ---
 
