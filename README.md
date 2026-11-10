@@ -4,7 +4,7 @@
 
 This project demonstrates a complete end-to-end DevOps CI/CD pipeline built using AWS and modern DevOps tools.
 
-The application is a Python Flask web application that is containerized using Docker, stored in Amazon ECR, deployed to Amazon EKS using Kubernetes, and automatically deployed through GitHub Actions whenever code is pushed to the GitHub repository.
+The application is a Python Flask web application that is containerized using Docker, stored in Amazon ECR, deployed to Amazon EKS using Kubernetes, and automatically deployed through GitHub Actions whenever code is pushed to the GitHub repository
 
 ---
 
