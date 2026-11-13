@@ -2,6 +2,14 @@
 pipeline {
     agent any
 
+    parameters {
+        string(
+            name: 'BRANCH_NAME',
+            defaultValue: 'main',
+            description: 'Enter the Git branch to build'
+        )
+    }
+
     environment {
         IMAGE_NAME = 'aws-devops-project'
         CONTAINER_NAME = 'flask-demo'
@@ -11,14 +19,17 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'Getting application source code from GitHub'
-                checkout scm
+                echo "Checking out branch: ${params.BRANCH_NAME}"
+
+                git branch: "${params.BRANCH_NAME}",
+                    url: 'https://github.com/yuvashreeSanthanam/aws-devops-project.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image'
+
                 sh 'docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} .'
             }
         }
