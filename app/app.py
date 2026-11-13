@@ -135,7 +135,7 @@ def home():
 
                 <div class="card">
                     <h3>Application Version</h3>
-                    <p>Version 7.0</p>
+                    <p>Version 8.0</p>
                 </div>
 
                 <div class="card">
